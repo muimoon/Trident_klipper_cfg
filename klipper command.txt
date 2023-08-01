@@ -11,7 +11,103 @@ ls /dev/serial/by-id/  查询主板ID
 ifconfig 查询链接
 nmtui 更改WIFI  选第二项
 nmtui dev wifi 扫描WiFi
+Klipper
 
+cd ~/klipper/
+make menuconfig
+make
+
+sudo service klipper stop
+make flash FLASH_DEVICE=/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0
+sudo service klipper start
+
+
+grep biqu /etc/passwd
+sudo usermod -a -G root biqu
+
+lsusb
+ls /dev/serial/by-id/
+ifconfig
+
+###
+KIAUH installation guide
+
+sudo apt-get update && sudo apt-get install git -y
+cd ~ && git clone https://github.com/th33xitus/kiauh.git
+./kiauh/kiauh.sh
+###
+
+cd~
+ls
+rm -rf kiauh
+rm -rf kiauh-backups
+###
+
+"/boot/BoardEnv.txt"
+cd~/CanBoot/scripts
+python3 flash_ Can.py - i can0 - q
+
+TEST_RESONANCES AXIS=X 测试X轴共振
+TEST_RESONANCES AXIS=Y
+SHAPER_CALIBRATE  共振校准 自动测试
+biqu
+~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0
+###
+pad7
+###
+hostname="BTT-Pad7"
+overlays=ws2812 light mcp2515 spidev1_1
+[mcu Pad7]
+serial: /tmp/klipper_host_mcu
+[adxl345]
+cs_pin: Pad7:None
+spi_bus: spidev1.1
+axes_map: z,y,-x  # Modify according to the actual orientation of the ADXL345 installed on the printer.
+
+~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0 查询CAN0ID
+
+sudo nano /etc/network/interfaces.d/can0 CAN0设置
+
+allow-hotplug can0
+iface can0 can static
+bitrate 1000000
+up ifconfig $IFACE txqueuelen 1024
+
+Steps to enable spi on the Cb1
+
+ssh into your cb1
+
+Make a backup of /boot/BoardEnv.txt
+
+cd /boot
+
+sudo cp BoardEnv.txt BoardEnv.Bak
+
+Then lets add the following to BoardEnv.txt
+
+( Append ) You can use nano to do this (sudo nano BoardEnv.txt)
+
+To save this changes use ctrl + X
+
+Then press Y to save changes.
+
+ls /dev/*spi*
+
+#######
+
+
+sudo apt-get update
+sudo apt-get upgrade
+
+####wifi:
+nmtui
+
+/dev/serial/by-id/usb-STMicroelectronics_MARLIN_STM32H723ZX_CDC_in_FS_Mode_305B346E3231-if00
+
+
+sudo service klipper stop
+make flash FLASH_DEVICE=/dev/serial/by-id/usb-STMicroelectronics_MARLIN_STM32H723ZX_CDC_in_FS_Mode_305B346E3231-if00
+sudo service klipper start
 
 ls /dev/spidev 查看SPI 号
 # armbian-config
