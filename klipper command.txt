@@ -1,0 +1,200 @@
+sudo apt-get update
+sudo apt-get upgred -y
+sudo apt-get dist-upgred -y ###更新版本
+sudo nmcli c#####检测网卡
+sudo nmcli device wifi list ###扫描wifi
+shutdown -r now重启
+ipconfig 这个命令是会才找到端口的
+sudo ifdown can0  这个是关闭端口
+sudo ifup can0是打开端口
+ls /dev/serial/by-id/  查询主板ID
+ifconfig 查询链接
+nmtui 更改WIFI  选第二项
+nmtui dev wifi 扫描WiFi
+Klipper
+
+cd ~/klipper/
+make menuconfig
+make
+
+sudo service klipper stop
+make flash FLASH_DEVICE=/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0
+sudo service klipper start
+
+
+grep biqu /etc/passwd
+sudo usermod -a -G root biqu
+
+lsusb
+ls /dev/serial/by-id/
+ifconfig
+
+###
+KIAUH installation guide
+
+sudo apt-get update && sudo apt-get install git -y
+cd ~ && git clone https://github.com/th33xitus/kiauh.git
+./kiauh/kiauh.sh
+###
+
+cd~
+ls
+rm -rf kiauh
+rm -rf kiauh-backups
+###
+
+"/boot/BoardEnv.txt"
+cd~/CanBoot/scripts
+python3 flash_ Can.py - i can0 - q
+
+TEST_RESONANCES AXIS=X 测试X轴共振
+TEST_RESONANCES AXIS=Y
+SHAPER_CALIBRATE  共振校准 自动测试
+biqu
+~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0
+###
+pad7
+###
+hostname="BTT-Pad7"
+overlays=ws2812 light mcp2515 spidev1_1
+[mcu Pad7]
+serial: /tmp/klipper_host_mcu
+[adxl345]
+cs_pin: Pad7:None
+spi_bus: spidev1.1
+axes_map: z,y,-x  # Modify according to the actual orientation of the ADXL345 installed on the printer.
+
+~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0 查询CAN0ID
+
+sudo nano /etc/network/interfaces.d/can0 CAN0设置
+
+allow-hotplug can0
+iface can0 can static
+bitrate 1000000
+up ifconfig $IFACE txqueuelen 1024
+
+Steps to enable spi on the Cb1
+
+ssh into your cb1
+
+Make a backup of /boot/BoardEnv.txt
+
+cd /boot
+
+sudo cp BoardEnv.txt BoardEnv.Bak
+
+Then lets add the following to BoardEnv.txt
+
+( Append ) You can use nano to do this (sudo nano BoardEnv.txt)
+
+To save this changes use ctrl + X
+
+Then press Y to save changes.
+
+ls /dev/*spi*
+
+#######
+
+
+sudo apt-get update
+sudo apt-get upgrade
+
+####wifi:
+nmtui
+
+/dev/serial/by-id/usb-STMicroelectronics_MARLIN_STM32H723ZX_CDC_in_FS_Mode_305B346E3231-if00
+
+
+sudo service klipper stop
+make flash FLASH_DEVICE=/dev/serial/by-id/usb-STMicroelectronics_MARLIN_STM32H723ZX_CDC_in_FS_Mode_305B346E3231-if00
+sudo service klipper start
+
+ls /dev/spidev 查看SPI 号
+# armbian-config
+bootenv 里 最后一行加param_spidev_spi_bus=1
+ACCELEROMETER_QUERY  加速度 查询命令 
+MEASURE_AXES_NOISE   测试传感器噪声 100以内正常
+TEST_RESONANCES AXIS=X 测试X轴共振
+TEST_RESONANCES AXIS=Y
+SHAPER_CALIBRATE  共振校准 自动测试
+SAVE_CONFIG 保存参数
+
+https://docs.qq.com/doc/DYlN6U3Z1eFhKQnBr?friendUin=9LfCGMVggxEV4peYWMHMZg%253D%253D&dver=&u=105566e8b100455e8b860feefa1d1795  竹子切片保姆级教程
+
+https://realdeuce.github.io/Voron/PA/pressure_advance.html 压力校准生成网站
+在配置文件[extruder]节点下追加这句
+pressure_advance = 0.11
+
+  
+
+
+~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0 查询CAN0ID
+
+sudo nano /etc/network/interfaces.d/can0 CAN0设置
+
+allow-hotplug can0
+iface can0 can static
+bitrate 1000000
+up ifconfig $IFACE txqueuelen 1024
+
+下载脚本:
+git clone https://gitee.com/zm112/kiauh.git
+git clone -b CB1 https://github.com/bigtreetech/kiauh.git
+./kiauh/kiauh.sh 运行kiauh工具
+
+
+cd ~/klipper/
+make menuconfig
+
+
+make flash FLASH_DEVICE=0483:df11 烧录固件
+sudo dfu-util -d ,0483:df11 -R -a 0 -s 0x8000000:leave -D ./STM32G0B1-bootloader.hex
+sudo dfu-util -d ,0483:df11 -R -a 0 -s 0x8000000:leave -D ./M8P_bootloader.bin
+sudo dfu-util -d ,2e3c:df11 -R -c 1 -a 0 -D out/klipper.bin -s 0x08000000:force:mass-erase
+firmware.bin”
+https://github.com/KevinOConnor/klipper/blob/master/docs/Config_checks.md  
+国外官网
+https://github.com/EtteGit/EnragedRabbitProject 兔子多色
+3D MAX
+激活账号：3dmaxtong    激活密码：3dmax3696
+
+
+Max EZ
+ebb2209
+Found canbus_uuid=5e0b5b86f0e6, Application: Klipper
+Found canbus_uuid=136e95a63e22, Application: Klipper
+
+M8P        	canbus_uuid=72faa013d8c9, Application: Klipper
+Max EZ		canbus_uuid=5e0b5b86f0e6, Application: Klipper
+EBB2209    	canbus_uuid=5b7dee3cd0fd, Application: Klipper、
+  EBB36    canbus_uuid=ba77a64090be,
+sed -i 's/ID_SERIAL/ID_USB_SERIAL/g' /usr/lib/udev/rules.d/60-serial.rules
+udevadm control --reload-rules && udevadm trigger
+找不到ID 用
+
+G代码命令
+PROBE_CALIBRATE 探针校准
+BED_MESH_CALIBRATE 网床校准
+SAVE_CONFIG 保存参数
+
+sudo apt update  更新APT库  运动补偿
+sudo apt install python3-numpy python3-matplotlib libatlas-base-dev
+~/klippy-env/bin/pip install -v numpy
+
+~/klipper/scripts/calibrate_shaper.py /tmp/resonances_x_*.csv -o /tmp/shaper_calibrate_x.png    #生成X轴共振图
+~/klipper/scripts/calibrate_shaper.py /tmp/resonances_y_*.csv -o /tmp/shaper_calibrate_y.png    #生成Y轴共振图
+https://github.com/elcrni/Voron-Mods/tree/main/Orbiter_2.0_SB_CW2_Enclosed 伽利略2.0 适用 SB头
+
+
+ZH1.5  TAP 端子
+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
+https://freegpt.cc/
+Debian 更新systemd 247 后无法找到serial id的修复工具
+cd ~
+git clone https://gitee.com/Neko-vecter/klipper-at-gitee.git
+bash ~/klipper-at-gitee/tools/fix-by-id.sh
+
+
+
+
+
