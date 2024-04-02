@@ -1,0 +1,76 @@
+
+#bug修复,仅针对2.4等没有排便位置的机型,酌情更新,以后的版本会将此内容融合进完整的代码
+#20240402 muimoon 补充
+#请在change_tool段落的如下位置增加重置属性的代码,
+#[gcode_macro CHANGE_TOOL]
+#          {% else %}                                                  ##如果等于断电时的耗材情况,即不用触发耗材的切换程序,直接使用即可
+#                wakeup WAKEUP={TOOL}                                  ##唤醒近程挤出机与tool挤出机
+###==>
+                 SET_GCODE_VARIABLE MACRO=var VARIABLE=purgeline VALUE={0} ##重置属性
+#<==##增加部分                 
+#                {action_respond_info("目前加载的正是 %d 号位耗材" % (TOOL))} 
+#          {% endif %}
+
+
+#20240326 muimoon
+#请仔细阅读说明
+#以下加入开始G代码
+[gcode_macro PRINT_START] #Some of the custom start gcode will make the AMS not work correctly, need to check carefully
+gcode: 
+    	SET_GCODE_VARIABLE MACRO=var VARIABLE=state VALUE={1} ##更新为打印状态
+        SET_GCODE_VARIABLE MACRO=var VARIABLE=purgeline VALUE={1} ##重置属性
+
+#加入var.cfg文件
+[gcode_macro var]
+variable_purgeline:0               #开始打印时的擦除线,仅针对2.4
+
+#找个地方copy即可
+[gcode_macro prime_line]
+description:擦除线 by muimoon
+variable_pl_x: 20         #start position
+variable_pl_y: 5         #start position
+variable_x_offset: 150        #prime length
+gcode: 
+    {% set pu = params.pu|default(30)|int %}  
+    M117 prime...
+    G92 E0
+    G90
+    G0 X{pl_x} Y{pl_y} F6000
+    G0 Z0.2
+    G91
+    G1 X{x_offset} E{pu} F1200;
+    G1 Y1
+    G92 E0
+    G1 X{x_offset*(-1)} E{pu} F1200;
+    G92 E0;
+    G90
+ 
+ #原样替换MZ_Ams_LITE_C4_main.cfg中的相同段落
+[delayed_gcode jinliao]
+initial_duration: 0  
+gcode:
+	 {% set tnum= printer['gcode_macro jinliao']['tnum'] %}								##将刚获取的存储在jinliao的tunm
+	 {% set state= printer['gcode_macro var']['state'] %}								##获取var中的state（处于任务时state=1，未处于任务时state=0）默认为0
+	 {% set purgeline= printer['gcode_macro var']['purgeline'] %}
+     {action_respond_info("当正在为您加载耗材:二次确认")}				   ##显示文本二次确认
+	 {% set inout = printer['filament_switch_sensor INOUT'].filament_detected %}		##设置变量inout获取近程挤出机是否进料
+
+ 	 	{% if inout == 0  %}          													##如果近程挤出没有检测到耗材，强制刷新持续时长
+                UPDATE_DELAYED_GCODE ID=jinliao DURATION=1									##启动延时GCODE，方便持续检测
+  	  		    G92 E0
+  	  		    G1 E{printer["gcode_macro var"].inputs} F{printer["gcode_macro var"].inputspeed}
+                G4 P100
+	  	{% else %}   
+            {action_respond_info("已完成耗材加载")}										 ##显示已成功加载耗材 
+            G92 E0
+            G1 E{printer["gcode_macro var"].inputoks} F{printer["gcode_macro var"].inputokspeed}
+            UPDATE_DELAYED_GCODE ID=jinliao DURATION=0									##关闭延时GCODE（因为已经加载到位了）
+			{% if state == 1 %}															##如果打印机处于任务中
+                {% if purgeline == 1 %}
+                    prime_line pu=30
+                    SET_GCODE_VARIABLE MACRO=var VARIABLE=purgeline VALUE={0} ##重置属性
+                {% endif %}
+                M117 Printing...
+    			resume																		##恢复打印
+			{% endif %}
+		{% endif %}
