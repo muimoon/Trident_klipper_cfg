@@ -7,3 +7,5 @@ Octopi and Klipper installed.
 
 printer.cfg included
  
+https://clashforandroid.org/clash-for-android-download/
+https://github.com/Clon1998/mobileraker/releases/tag/android2.8.4
